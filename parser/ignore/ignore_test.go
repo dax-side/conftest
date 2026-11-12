@@ -54,3 +54,34 @@ func TestParser_Unmarshal(t *testing.T) {
 		t.Errorf("first ignore entry's Kind should be '%v', was '%v'", expectedOriginal, actualOriginal)
 	}
 }
+
+func TestParser_UnmarshalTrailingBackslash(t *testing.T) {
+	parser := Parser{}
+
+	sample := "a: b\\\n!c\\\n# d\\\nkeep\\ \nx\\\\"
+
+	var listOfEntryLists [][]map[string]any
+	if err := parser.Unmarshal([]byte(sample), &listOfEntryLists); err != nil {
+		t.Fatalf("parser should not have thrown an error: %v", err)
+	}
+
+	expected := []struct{ kind, value, original string }{
+		{"Path", "a: b", "a: b\\"},
+		{"NegatedPath", "c", "!c\\"},
+		{"Comment", "d\\", "# d\\"},
+		{"Path", "keep ", "keep\\ "},
+		{"Path", "x\\", "x\\\\"},
+	}
+
+	entries := listOfEntryLists[0]
+	if len(entries) != len(expected) {
+		t.Fatalf("there should be exactly %d entries but there were %d", len(expected), len(entries))
+	}
+
+	for i, want := range expected {
+		got := entries[i]
+		if got["Kind"] != want.kind || got["Value"] != want.value || got["Original"] != want.original {
+			t.Errorf("entry %d: got %v, want Kind=%q Value=%q Original=%q", i, got, want.kind, want.value, want.original)
+		}
+	}
+}

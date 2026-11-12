@@ -28,7 +28,6 @@ require (
 	github.com/open-policy-agent/opa v1.22.2
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/owenrumney/go-sarif/v2 v2.3.3
-	github.com/shteou/go-ignore v0.3.1
 	github.com/spdx/tools-golang v0.5.7
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
